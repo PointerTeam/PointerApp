@@ -8,7 +8,7 @@ Android app that lets you put messages on a map and get messages near you
 - 🐶
 - 🐱
 - 🐹
-- 🐰
+- 🐰 Luana @l398chen
 - 🐼
 - 🐵
 
