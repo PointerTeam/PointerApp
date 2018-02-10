@@ -17,7 +17,8 @@
             android:orientation="vertical">
             <TextView
                 android:text="@string/ping_description"
-                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/ping_button"
@@ -27,7 +28,8 @@
             <TextView
                 android:id="@+id/ping_response_textview"
                 android:text="@string/ping_response_default"
-                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </FrameLayout>

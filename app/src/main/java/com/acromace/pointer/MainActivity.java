@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button pingButton;
     private TextView pingResponseTextView;
+    private String pingOutputText; // This is terrible, will refactor
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private void makePingRequest() {
         Log.v(TAG, "Ping!");
         pingResponseTextView.setText("Making request to server...");
+        final MainActivity mainActivity = this;
+        String outputText;
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -64,21 +67,27 @@ public class MainActivity extends AppCompatActivity {
                     final int responseCode =myConnection.getResponseCode();
                     if (responseCode != 200) {
                         Log.w(TAG, String.format("Server returned status code: %d", responseCode));
-                        pingResponseTextView.setText(String.format("Server returned status code: %d", responseCode));
+                        pingOutputText = String.format("Server returned status code: %d", responseCode);
                     }
 
                     final InputStream inputStream = myConnection.getInputStream();
                     final Scanner scanner = new Scanner(inputStream, "UTF-8");
                     final String response = scanner.next();
                     Log.d(TAG, response);
-                    pingResponseTextView.setText(response);
+                    pingOutputText = response;
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
-                    pingResponseTextView.setText(e.getLocalizedMessage());
+                    pingOutputText = e.getLocalizedMessage();
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
-                    pingResponseTextView.setText(e.getLocalizedMessage());
+                    pingOutputText = e.getLocalizedMessage();
                 }
+                mainActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pingResponseTextView.setText(pingOutputText);
+                    }
+                });
             }
         });
     }
