@@ -3,4 +3,5 @@
     <string name="ping_description">Tap the button to try pinging the server</string>
     <string name="ping_button_text">Ping!</string>
     <string name="ping_response_default">This is where the response from the server will go</string>
+    <string name="title_activity_create_point">Create Point</string>
 </resources>
