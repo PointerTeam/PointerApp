@@ -1,4 +1,4 @@
-# Pointer Client
+﻿# Pointer Client
 
 Android app that lets you put messages on a map and get messages near you
 
@@ -9,7 +9,7 @@ Android app that lets you put messages on a map and get messages near you
 - 🐱
 - 🐹
 - 🐰 Luana @l398chen
-- 🐼
+- 🐼 Nick @tkfi
 - 🐵 JP @junpark97
 
 
