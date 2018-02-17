@@ -4,31 +4,43 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements PingCallbackInterface {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-    private static final String TAG = "MainActivity";
 
-    private Server server = new Server();
-    private Button pingButton;
-    private TextView pingResponseTextView;
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+
     private FloatingActionButton fab;
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Add a marker in Sydney, Australia,
+        // and move the map's camera to the same location.
+        LatLng sydney = new LatLng(-33.852, 151.211);
+        googleMap.addMarker(new MarkerOptions().position(sydney).title("Sydney, Australia"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pingButton = findViewById(R.id.ping_button);
-        pingResponseTextView = findViewById(R.id.ping_response_textview);
         fab = findViewById(R.id.add_fab);
 
         setupFab();
-        setupPingButton();
+
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void setupFab() {
@@ -38,35 +50,6 @@ public class MainActivity extends AppCompatActivity implements PingCallbackInter
             public void onClick(View view) {
                 Intent intent = new Intent(mainActivity, CreatePointActivity.class);
                 startActivity(intent);
-            }
-        });
-    }
-
-    private void setupPingButton() {
-        if (pingButton == null) {
-            Log.e(TAG, "Could not find the ping button");
-            return;
-        }
-
-        pingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                makePingRequest();
-            }
-        });
-    }
-
-    private void makePingRequest() {
-        pingResponseTextView.setText("Making request to server...");
-        server.makePingRequest(this);
-    }
-
-    @Override
-    public void pingResponse(final String response) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pingResponseTextView.setText(response);
             }
         });
     }
