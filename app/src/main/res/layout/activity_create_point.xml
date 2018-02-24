@@ -36,11 +36,11 @@
             android:textColor="#000"
             android:textStyle="bold"
             android:text="Place a message at your current location" />
-        <EditText
+        <EditText android:id="@+id/edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter a message" />
-        <Button
+        <Button android:id="@+id/send"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

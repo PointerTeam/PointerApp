@@ -42,7 +42,8 @@ public class Server {
     void createPoint(final Point point, final CreatePointCallbackInterface callback) {
         Log.d(TAG, "Creating point: " + point.toString());
         Log.d(TAG, "Creating points is not implemented, returning success");
-        callback.createPointResponse(true, null);
+        //callback.createPointResponse(true, null);
+        callback.createPointResponse(false, "Error: failed to send message");
     }
 
     void getPoints(final long latitude, final long longitude, final GetPointsCallbackInterface callback) {
