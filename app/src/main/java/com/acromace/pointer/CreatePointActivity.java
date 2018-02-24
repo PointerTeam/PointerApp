@@ -19,6 +19,7 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
     {
         if (success) {
             //exit page
+            finish();
         }
         else {
             //show user errorMessage
@@ -44,6 +45,16 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
             @Override
             public void onClick(View view) {
                 server.createPoint(new Point(0, 0, "Hello"), self);
+            }
+        });
+
+        Toolbar pToolbar = findViewById(R.id.toolbar);
+        pToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+
+        pToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }
