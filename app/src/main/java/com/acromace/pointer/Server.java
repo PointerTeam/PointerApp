@@ -40,6 +40,7 @@ public class Server {
     private static final String SERVER = SERVER_REMOTE; // Change this to SERVER_LOCALHOST to test locally
 
     void createPoint(final Point point, final CreatePointCallbackInterface callback) {
+        // TODO: Implement making the network call
         Log.d(TAG, "Creating point: " + point.toString());
         Log.d(TAG, "Creating points is not implemented, returning success");
         callback.createPointResponse(true, null);
@@ -47,6 +48,7 @@ public class Server {
     }
 
     void getPoints(final double latitude, final double longitude, final GetPointsCallbackInterface callback) {
+        // TODO: Implement making the network call
         Log.d(TAG, "Getting points at " + latitude + ", " + longitude);
         Log.d(TAG, "Getting points is not implemented, returning fake points");
         ArrayList<Point> points = new ArrayList<>();

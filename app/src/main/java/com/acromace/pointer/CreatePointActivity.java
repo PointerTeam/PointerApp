@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class CreatePointActivity extends AppCompatActivity implements CreatePointCallbackInterface {
 
     Server server = new Server();
@@ -44,7 +46,7 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
         findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                server.createPoint(new Point(0, 0, "Hello"), self);
+                server.createPoint(new Point(getCurrentLocation(), getEnteredMessage()), self);
             }
         });
 
@@ -59,4 +61,13 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
         });
     }
 
+    private LatLng getCurrentLocation() {
+        // TODO: Change this to get the actual location
+        return new LatLng(43.47, -80.54);
+    }
+
+    private String getEnteredMessage() {
+        // TODO: Change this to get the message
+        return "Hello";
+    }
 }

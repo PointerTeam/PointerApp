@@ -15,7 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
+// TODO: Add a button to recenter the map at your your location (see Maps app)
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "MainActivity";
@@ -23,11 +23,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions().position(sydney).title("Sydney, Australia"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng currentLocation = getCurrentLocation();
+        // Create a marker in Waterloo
+        // TODO: Separate out map marker creation to another function
+        // TODO: Change the Google Maps pin to something that looks better
+        // TODO: Add the points from Server.getPoints() to the map instead
+        googleMap.addMarker(new MarkerOptions().position(currentLocation).title("Waterloo, Ontario"));
+        // Move the map's camera to the location
+        // TODO: Also zoom into the camera on the map
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
     }
 
     @Override
@@ -74,5 +78,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(intent);
             }
         });
+    }
+
+    private LatLng getCurrentLocation() {
+        // TODO: Implement this to return the actual location
+        return new LatLng(43.47, -80.54);
     }
 }
