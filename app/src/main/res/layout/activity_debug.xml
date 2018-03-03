@@ -28,12 +28,14 @@
                 android:id="@+id/latitude_edittext"
                 android:layout_width="128dp"
                 android:layout_height="64dp"
-                android:hint="@string/latitude"/>
+                android:hint="@string/latitude"
+                android:text="@string/debug_default_latitude"/>
             <EditText
                 android:id="@+id/longitude_edittext"
                 android:layout_width="128dp"
                 android:layout_height="64dp"
-                android:hint="@string/longitude"/>
+                android:hint="@string/longitude"
+                android:text="@string/debug_default_longitude"/>
             <EditText
                 android:id="@+id/message_edittext"
                 android:layout_width="128dp"

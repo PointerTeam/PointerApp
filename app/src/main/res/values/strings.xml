@@ -19,4 +19,7 @@
     <string name="get_points_debug_text">Get points</string>
     <string name="server_request_placeholder">Making request to server&#8230;</string>
     <string name="server_response_default">This is where the response from the server will go</string>
+    <string name="no_coordinates_entered_text">You must enter coordinates for the message(s) first</string>
+    <string name="debug_default_latitude">43.47</string>
+    <string name="debug_default_longitude">-80.54</string>
 </resources>

@@ -46,7 +46,7 @@ public class Server {
         //callback.createPointResponse(false, "Error: failed to send message");
     }
 
-    void getPoints(final long latitude, final long longitude, final GetPointsCallbackInterface callback) {
+    void getPoints(final double latitude, final double longitude, final GetPointsCallbackInterface callback) {
         Log.d(TAG, "Getting points at " + latitude + ", " + longitude);
         Log.d(TAG, "Getting points is not implemented, returning fake points");
         ArrayList<Point> points = new ArrayList<>();

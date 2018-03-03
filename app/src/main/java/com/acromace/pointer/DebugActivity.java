@@ -105,11 +105,19 @@ public class DebugActivity extends AppCompatActivity implements PingCallbackInte
     }
 
     private void makeCreatePointRequest() {
+        if (!areCoordinatesEntered()) {
+            serverResponseTextView.setText(R.string.no_coordinates_entered_text);
+            return;
+        }
         serverResponseTextView.setText(R.string.server_request_placeholder);
         server.createPoint(new Point(getLatitude(), getLongitude(), getMessage()), this);
     }
 
     private void makeGetPointsRequest() {
+        if (!areCoordinatesEntered()) {
+            serverResponseTextView.setText(R.string.no_coordinates_entered_text);
+            return;
+        }
         serverResponseTextView.setText(R.string.server_request_placeholder);
         server.getPoints(getLatitude(), getLongitude(), this);
     }
@@ -149,15 +157,19 @@ public class DebugActivity extends AppCompatActivity implements PingCallbackInte
         });
     }
 
-    private long getLatitude() {
-        return Long.valueOf(latitudeEditText.getText().toString());
+    private double getLatitude() {
+        return Double.valueOf(latitudeEditText.getText().toString());
     }
 
-    private long getLongitude() {
-        return Long.valueOf(longitudeEditText.getText().toString());
+    private double getLongitude() {
+        return Double.valueOf(longitudeEditText.getText().toString());
     }
 
     private String getMessage() {
         return messageEditText.getText().toString();
+    }
+
+    private boolean areCoordinatesEntered() {
+        return latitudeEditText.getText().length() > 0 && longitudeEditText.getText().length() > 0;
     }
 }
