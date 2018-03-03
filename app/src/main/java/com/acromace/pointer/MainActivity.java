@@ -15,6 +15,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 // TODO: Add a button to recenter the map at your your location (see Maps app)
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -32,6 +34,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Move the map's camera to the location
         // TODO: Also zoom into the camera on the map
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+    }
+
+    // getPointsResponse(success, points, errorMessage) puts points on the map, with success
+    // indicating if the points have been successfully fetched. errorMessage if it is not a
+    // success. If they have been successfully fetched, then points contains all of the points
+    // in the requested area.
+    void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
+
     }
 
     @Override
