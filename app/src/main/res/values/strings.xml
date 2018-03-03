@@ -1,9 +1,25 @@
 <resources>
+    <!-- Common -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="message">Message</string>
+    <string name="message_default">Hello world!</string>
+
+    <!-- MainActivity -->
     <string name="app_name">Pointer</string>
     <string name="action_debug">Debug</string>
-    <string name="ping_description">Tap the button to try pinging the server</string>
-    <string name="ping_button_text">Ping!</string>
-    <string name="ping_response_default">This is where the response from the server will go</string>
+
+    <!-- CreatePointActivity -->
     <string name="title_activity_create_point">Create Point</string>
+
+    <!-- DebugActivity -->
     <string name="title_activity_debug">Debug</string>
+    <string name="ping_button_text">Ping the server</string>
+    <string name="create_point_debug_text">Create point</string>
+    <string name="get_points_debug_text">Get points</string>
+    <string name="server_request_placeholder">Making request to server&#8230;</string>
+    <string name="server_response_default">This is where the response from the server will go</string>
+    <string name="no_coordinates_entered_text">You must enter coordinates for the message(s) first</string>
+    <string name="debug_default_latitude">43.47</string>
+    <string name="debug_default_longitude">-80.54</string>
 </resources>

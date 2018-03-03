@@ -1,24 +1,32 @@
 package com.acromace.pointer;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by acromace on 2018-02-17.
  */
 
 public class Point {
 
-    final private double latitude;
-    final private double longitude; // We can't name this "long" since that's a type
+    final private LatLng position;
     final private String message;
 
-    public Point(double latitude, double longitude, String message) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    Point(final double latitude, final double longitude, final String message) {
+        this.position = new LatLng(latitude, longitude);
         this.message = message;
     }
 
+    Point(final LatLng position, final String message) {
+        this.position = position;
+        this.message = message;
+    }
+
+    LatLng getPosition() {
+        return this.position;
+    }
+
     public String toString() {
-        return "Point[ Location: (" + this.latitude + ", " + this.longitude
-                + "), Message: " + this.message + " ]";
+        return "Point[ Location: " + this.position.toString() + ", Message: " + this.message + " ]";
     }
 
 }
