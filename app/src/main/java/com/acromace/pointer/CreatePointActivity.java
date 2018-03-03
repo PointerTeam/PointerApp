@@ -24,7 +24,6 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
         else {
             //show user errorMessage
             Context context = getApplicationContext();
-            //CharSequence text = errorMessage;
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, errorMessage, duration);
@@ -48,10 +47,9 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
             }
         });
 
-        Toolbar pToolbar = findViewById(R.id.toolbar);
-        pToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 
-        pToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
