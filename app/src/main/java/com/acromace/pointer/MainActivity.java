@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 LatLng loc = new LatLng(latitude, longitude);
                 googleMap.addMarker(new MarkerOptions().position(loc).title("Your Location"));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
             }
 
             @Override
