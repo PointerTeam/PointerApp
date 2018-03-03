@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -74,7 +75,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.i(TAG, latitude + " " + longitude);
 
                 LatLng loc = new LatLng(latitude, longitude);
-                googleMap.addMarker(new MarkerOptions().position(loc).title("Your Location"));
+                googleMap.addMarker(new MarkerOptions()
+                        .position(loc)
+                        .title("Your Location"));
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)));
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
             }
 
@@ -163,10 +167,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(intent);
             }
         });
-    }
-
-    private LatLng getCurrentLocation() {
-        // TODO: Implement this to return the actual location
-        return new LatLng(43.47, -80.54);
     }
 }
