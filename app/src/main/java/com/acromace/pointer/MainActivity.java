@@ -36,10 +36,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 // TODO: Add the points from Server.getPoints() to the map instead
 // TODO: Also zoom into the camera on the map
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GetPointsCallbackInterface {
 
     private static final String TAG = "MainActivity";
     private FloatingActionButton fab;
+    private GoogleMap googleMap;
+    private Server server = new Server();
 
     public static final int LOCATION_REQUEST = 1;
 
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(final GoogleMap googleMap) {
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        this.googleMap = googleMap;
 
         //Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -62,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LOCATION_REQUEST);
         }
 
+        final MainActivity self = this;
+
         LocationListener ll = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -70,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //when the location changes, update the map by zooming to the location
                 double longitude = location.getLongitude();
                 double latitude = location.getLatitude();
+
+                //Asking for the points
+                server.getPoints(latitude, longitude, self);
 
                 Log.i(TAG, latitude + " " + longitude);
 
@@ -123,8 +131,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // indicating if the points have been successfully fetched. errorMessage if it is not a
     // success. If they have been successfully fetched, then points contains all of the points
     // in the requested area.
-    void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
-
+    public void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
+        if (googleMap == null ) {
+            Log.d(TAG, "map has not been loaded in yet.");
+            return;
+        }
+        for (Point point: points) {
+            LatLng loc = point.getPosition();
+            String msg = point.getMessage();
+            googleMap.addMarker(new MarkerOptions().position(loc).title(msg));
+        }
     }
 
     @Override
