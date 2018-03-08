@@ -136,15 +136,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // success. If they have been successfully fetched, then points contains all of the points
     // in the requested area.
     public void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
-        if (googleMap == null ) {
-            Log.d(TAG, "map has not been loaded in yet.");
-            return;
-        }
-        for (Point point: points) {
-            LatLng loc = point.getPosition();
-            String msg = point.getMessage();
-            googleMap.addMarker(new MarkerOptions().position(loc).title(msg));
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (googleMap == null ) {
+                    Log.d(TAG, "map has not been loaded in yet.");
+                    return;
+                }
+                for (Point point: points) {
+                    LatLng loc = point.getPosition();
+                    String msg = point.getMessage();
+                    googleMap.addMarker(new MarkerOptions().position(loc).title(msg));
+                }
+            }
+        });
     }
 
     @Override
