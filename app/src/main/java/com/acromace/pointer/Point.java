@@ -21,6 +21,10 @@ public class Point {
         this.message = message;
     }
 
+    String getMessage() {
+        return this.message;
+    }
+
     LatLng getPosition() {
         return this.position;
     }

@@ -6,7 +6,7 @@ Android app that lets you put messages on a map and get messages near you
 ## Team members
 
 - 🐶 Apoorv @apoorvp16
-- 🐱
+- 🐱 Umang @Umang080799
 - 🐹
 - 🐰 Luana @l398chen
 - 🐼 Nick @tkfi
