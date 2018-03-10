@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FloatingActionButton fabCurrLoc;
     private GoogleMap googleMap;
     private Server server = new Server();
-    private LatLng currentLocation; // Current location of the user
+    private static LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
     // TODO: Find a way to check if the user has scrolled on the map and save it here
     private boolean hasScrolled = false;
@@ -67,6 +67,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
+
+        googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                                                     @Override
+                                                     public void onCameraMoveStarted(int i) {
+                                                         hasScrolled = true;
+                                                     }
+
+                                                 });
+
 
         // Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -103,12 +112,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 updateMap();
                 // TODO: Move this to updateMap and get the location from the saved one
                 // TODO: Change the Google Maps pin to something that looks better
-                // TODO: Also zoom into the camera on the map if you haven't moved the camera
                 googleMap.addMarker(new MarkerOptions()
                         .position(currentLocation)
                         .title("Your Location"));
                         //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)));
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                if(!hasScrolled) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                }
             }
 
             @Override
@@ -200,11 +210,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setupFab() {
         final MainActivity mainActivity = this;
-        // TODO: Send the current location to the CreatePointActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mainActivity, CreatePointActivity.class);
+                intent.putExtra("currLoc", currentLocation); //transfer currLoc to CreatePoint
                 startActivity(intent);
             }
         });
@@ -221,17 +231,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void updateMap() {
         // TODO: Have this function clear the map and re-add your current position and your points
-        clearPointsFromMap();
         // This function should just be called when we receive new points (i.e. getPointsResponse)
         // and when our location is updated (i.e. onLocationChanged)
+        clearPointsFromMap();
+        //update points
+        //display points
     }
 
     private void clearPointsFromMap() {
-        // TODO: Find out how to clear points from the map
+        if (googleMap != null) {
+            googleMap.clear();
+        }
     }
 
     private void centreMap() {
         // Centres map at current location
+        hasScrolled = false;
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
     }
 }

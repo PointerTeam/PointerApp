@@ -7,14 +7,21 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class CreatePointActivity extends AppCompatActivity implements CreatePointCallbackInterface {
 
     Server server = new Server();
+    private static final String TAG = "CreatePointActivity";
+    private GoogleMap googleMap;
+    LatLng currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +30,18 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Get currLoc transferred from Main
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            currentLocation = (LatLng) extras.get("currLoc");
+        }
+
         // Create the point when the user presses the button
         final CreatePointActivity self = this;
         findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                server.createPoint(new Point(getCurrentLocation(), getEnteredMessage()), self);
+                server.createPoint(new Point(currentLocation, getEnteredMessage()), self);
             }
         });
 
@@ -64,13 +77,9 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
         });
     }
 
-    private LatLng getCurrentLocation() {
-        // TODO: Change this to get the actual location (see findViewById)
-        return new LatLng(43.47, -80.54);
-    }
-
     private String getEnteredMessage() {
-        // TODO: Change this to get the message from the text box (see findViewById)
-        return "Hello";
+        EditText text = findViewById(R.id.edit);
+        Log.i(TAG, "TextBox: " + text.getText().toString());
+        return text.getText().toString();
     }
 }
