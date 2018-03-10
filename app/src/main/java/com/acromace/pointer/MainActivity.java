@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FloatingActionButton fabCurrLoc;
     private GoogleMap googleMap;
     private Server server = new Server();
-    private LatLng currentLocation; // Current location of the user
+    private static LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
     // TODO: Find a way to check if the user has scrolled on the map and save it here
     private boolean hasScrolled = false;
@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mainActivity, CreatePointActivity.class);
+                intent.putExtra("currLoc", currentLocation); //transfer currLoc to CreatePoint
                 startActivity(intent);
             }
         });
