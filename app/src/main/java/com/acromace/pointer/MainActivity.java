@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String TAG = "MainActivity";
     public static final int LOCATION_REQUEST = 1;
     private FloatingActionButton fab;
+    private FloatingActionButton fabCurrLoc;
     private GoogleMap googleMap;
     private Server server = new Server();
     private LatLng currentLocation; // Current location of the user
@@ -49,8 +50,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.add_fab);
+        fabCurrLoc = findViewById(R.id.curr_loc);
 
         setupFab();
+        setupFabCurrLoc();
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
@@ -95,16 +98,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 // TODO: Save your current location to a variable and call updateMap
                 LatLng loc = new LatLng(latitude, longitude);
+                currentLocation = loc;
 
                 updateMap();
                 // TODO: Move this to updateMap and get the location from the saved one
                 // TODO: Change the Google Maps pin to something that looks better
                 // TODO: Also zoom into the camera on the map if you haven't moved the camera
                 googleMap.addMarker(new MarkerOptions()
-                        .position(loc)
+                        .position(currentLocation)
                         .title("Your Location"));
                         //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)));
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
             }
 
             @Override
@@ -150,10 +154,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // success. If they have been successfully fetched, then points contains all of the points
     // in the requested area.
     public void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
+        final MainActivity self = this;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // TODO: Save the points here to self
+                self.points = points;
                 if (googleMap == null ) {
                     Log.w(TAG, "Points loaded but map has not");
                     return;
@@ -204,6 +210,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    private void setupFabCurrLoc() {
+        fabCurrLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                centreMap();
+            }
+        });
+    }
+
     private void updateMap() {
         // TODO: Have this function clear the map and re-add your current position and your points
         clearPointsFromMap();
@@ -213,5 +228,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void clearPointsFromMap() {
         // TODO: Find out how to clear points from the map
+    }
+
+    private void centreMap() {
+        // Centres map at current location
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
     }
 }
