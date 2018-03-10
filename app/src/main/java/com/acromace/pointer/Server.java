@@ -70,9 +70,6 @@ public class Server {
                             (HttpURLConnection) getEndpoint.openConnection();
                     try {
                         InputStream in = myConnection.getInputStream();
-//                        URL(HttpURLConnection.getInputStream()) = latitude + longitude;
-                        ;
-
                     } finally {
                         myConnection.disconnect();
                     }
@@ -80,43 +77,11 @@ public class Server {
                     if (responseCode != 200) {
                         Log.w(TAG, String.format("Server returned status code: %d", responseCode));
                     }
-
-                     /* public Message readMessage(JsonReader reader) throws IOException {
-                    long id = -1;
-                    String text = null;
-                    User user = null;
-                    List<Double> geo = null;
-
-                    reader.beginObject();
-                    while (reader.hasNext()) {
-                        String name = reader.nextName();
-                        if (name.equals("id")) {
-                            id = reader.nextLong();
-                        } else if (name.equals("text")) {
-                            text = reader.nextString();
-                        } else if (name.equals("geo") && reader.peek() != JsonToken.NULL) {
-                            geo = readDoublesArray(reader);
-                        } else if (name.equals("user")) {
-                            user = readUser(reader);
-                        } else {
-                            reader.skipValue();
-                        }
-                    }
-                    reader.endObject();
-                    return new Message(id, text, user, geo);
-                }
-
-                  Scanner sc = new Scanner(System.in); */
-
-
                     final InputStream inputStream = myConnection.getInputStream();
                     final Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\Z");
                     final String response = scanner.next();
-                    // [{"message": "Hello world!", "location": {"lat": 43.472113, "long": -80.543936}}, {"message": "thank mr goose", "location": {"lat": 43.471772, "long": -80.545337}}]
-
                     final JSONArray token = new JSONArray(response);
                     for(int i = 0 ; i < token.length() ; i++) {
-                        // {"message": "Hello world!", "location": {"lat": 43.472113, "long": -80.543936}}
                         final JSONObject json = token.getJSONObject(i);
                         final String messages = json.getString("message");
                         final JSONObject location = json.getJSONObject("location");
@@ -128,9 +93,6 @@ public class Server {
                     System.out.println(response);
                     Log.d(TAG, response);
                     callback.getPointsResponse(true, points, null);
-                    /*final String message = response;
-                    double latitude = scanner.next();
-                    double longitude = scanner.next();*/
                    getspoint = response;
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
