@@ -30,14 +30,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 // TODO: Separate out map marker creation to another function
 // TODO: Refresh the list of Points when coming back from CreatePointActivity
 
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GetPointsCallbackInterface {
 
     private static final String TAG = "MainActivity";
+    public static final int LOCATION_REQUEST = 1;
     private FloatingActionButton fab;
     private GoogleMap googleMap;
     private Server server = new Server();
-
-    public static final int LOCATION_REQUEST = 1;
+    private LatLng currentLocation; // Current location of the user
+    private ArrayList<Point> points; // Points fetched from getPoints
+    // TODO: Find a way to check if the user has scrolled on the map and save it here
+    private boolean hasScrolled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +93,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //Asking for the points at the location
                 server.getPoints(latitude, longitude, self);
 
-                // TODO: Also zoom into the camera on the map
+                // TODO: Save your current location to a variable and call updateMap
                 LatLng loc = new LatLng(latitude, longitude);
+
+                updateMap();
+                // TODO: Move this to updateMap and get the location from the saved one
                 // TODO: Change the Google Maps pin to something that looks better
+                // TODO: Also zoom into the camera on the map if you haven't moved the camera
                 googleMap.addMarker(new MarkerOptions()
                         .position(loc)
                         .title("Your Location"));
@@ -145,13 +153,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // TODO: Save the points here to load when the map loads
+                // TODO: Save the points here to self
                 if (googleMap == null ) {
                     Log.w(TAG, "Points loaded but map has not");
                     return;
                 }
-                clearPointsFromMap();
+                updateMap();
 
+                // TODO: Move this to updateMap and get the points from the self that you saved above
                 for (Point point: points) {
                     LatLng loc = point.getPosition();
                     String msg = point.getMessage();
@@ -193,6 +202,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(intent);
             }
         });
+    }
+
+    private void updateMap() {
+        // TODO: Have this function clear the map and re-add your current position and your points
+        clearPointsFromMap();
+        // This function should just be called when we receive new points (i.e. getPointsResponse)
+        // and when our location is updated (i.e. onLocationChanged)
     }
 
     private void clearPointsFromMap() {

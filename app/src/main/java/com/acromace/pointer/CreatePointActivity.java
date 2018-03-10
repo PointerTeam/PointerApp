@@ -65,12 +65,12 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
     }
 
     private LatLng getCurrentLocation() {
-        // TODO: Change this to get the actual location
+        // TODO: Change this to get the actual location (see findViewById)
         return new LatLng(43.47, -80.54);
     }
 
     private String getEnteredMessage() {
-        // TODO: Change this to get the message from the text box
+        // TODO: Change this to get the message from the text box (see findViewById)
         return "Hello";
     }
 }
