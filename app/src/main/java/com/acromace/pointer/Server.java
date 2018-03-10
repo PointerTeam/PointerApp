@@ -9,6 +9,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -17,6 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -136,13 +143,46 @@ public class Server {
     }
 
     void getPoints(final double latitude, final double longitude, final GetPointsCallbackInterface callback) {
-        // TODO: Implement making the network call
         Log.d(TAG, "Getting points at " + latitude + ", " + longitude);
-        Log.d(TAG, "Getting points is not implemented, returning fake points");
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(43.472113, -80.543936, "I am a fake point #1"));
-        points.add(new Point(43.471772, -80.545337, "I am a fake point #2"));
-        callback.getPointsResponse(true, points, null);
+        final ArrayList<Point> points = new ArrayList<>();
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                try {
+                    final URL getEndpoint = new URL(SERVER + "messages?lat=" + latitude + "&lon=" + longitude);
+                    final HttpURLConnection myConnection =
+                            (HttpURLConnection) getEndpoint.openConnection();
+                    final int responseCode = myConnection.getResponseCode();
+                    if (responseCode != 200) {
+                        Log.w(TAG, String.format("Server returned status code: %d", responseCode));
+                    }
+                    final InputStream inputStream = myConnection.getInputStream();
+                    final Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\Z");
+                    final String response = scanner.next();
+                    final JSONArray token = new JSONArray(response);
+                    for(int i = 0 ; i < token.length() ; i++) {
+                        final JSONObject json = token.getJSONObject(i);
+                        final String messages = json.getString("message");
+                        final JSONObject location = json.getJSONObject("location");
+                        final double lat = location.getDouble("lat");
+                        final double lon = location.getDouble("lon");
+                        Point point= new Point(lat, lon, messages);
+                        points.add(point);
+                    }
+                    System.out.println(response);
+                    Log.d(TAG, response);
+                    callback.getPointsResponse(true, points, null);
+                } catch (MalformedURLException e) {
+                    Log.e(TAG, "URL provided was malformed");
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
+                } catch (java.io.IOException e) {
+                    Log.e(TAG, "Error while opening connection to the server");
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
+                } catch (JSONException token) {
+                    Log.e(TAG, "JSON Exception error");
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
+                }
+            }
+        });
     }
 
     void makePingRequest(final PingCallbackInterface callback) {
