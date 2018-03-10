@@ -68,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
 
+        googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                                                     @Override
+                                                     public void onCameraMoveStarted(int i) {
+                                                         hasScrolled = true;
+                                                     }
+
+                                                 });
+
+
         // Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
@@ -108,7 +117,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .position(currentLocation)
                         .title("Your Location"));
                         //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)));
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                if(!hasScrolled) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                }
             }
 
             @Override
@@ -224,14 +235,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         clearPointsFromMap();
         // This function should just be called when we receive new points (i.e. getPointsResponse)
         // and when our location is updated (i.e. onLocationChanged)
+
     }
 
     private void clearPointsFromMap() {
         // TODO: Find out how to clear points from the map
+        if (googleMap != null) {
+            googleMap.clear();
+        }
     }
 
     private void centreMap() {
         // Centres map at current location
+        hasScrolled = false;
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
     }
 }
