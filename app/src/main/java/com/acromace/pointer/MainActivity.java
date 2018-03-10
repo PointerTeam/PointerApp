@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 updateMap();
                 // TODO: Move this to updateMap and get the location from the saved one
                 // TODO: Change the Google Maps pin to something that looks better
-                // TODO: Also zoom into the camera on the map if you haven't moved the camera
                 googleMap.addMarker(new MarkerOptions()
                         .position(currentLocation)
                         .title("Your Location"));
@@ -200,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setupFab() {
         final MainActivity mainActivity = this;
-        // TODO: Send the current location to the CreatePointActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -222,9 +220,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void updateMap() {
         // TODO: Have this function clear the map and re-add your current position and your points
-        clearPointsFromMap();
         // This function should just be called when we receive new points (i.e. getPointsResponse)
         // and when our location is updated (i.e. onLocationChanged)
+        clearPointsFromMap();
+        //update points
+        //display points
     }
 
     private void clearPointsFromMap() {
