@@ -60,7 +60,7 @@ public class Server {
         AsyncTask.execute(new Runnable() {
             public void run() {
                 try {
-                    final URL getEndpoint = new URL(SERVER + "messages?lat=" + latitude + ",long=" + longitude);
+                    final URL getEndpoint = new URL(SERVER + "messages?lat=" + latitude + "&lon=" + longitude);
                     final HttpURLConnection myConnection =
                             (HttpURLConnection) getEndpoint.openConnection();
                     final int responseCode = myConnection.getResponseCode();
@@ -76,7 +76,7 @@ public class Server {
                         final String messages = json.getString("message");
                         final JSONObject location = json.getJSONObject("location");
                         final double lat = location.getDouble("lat");
-                        final double lon = location.getDouble("long");
+                        final double lon = location.getDouble("lon");
                         Point point= new Point(lat, lon, messages);
                         points.add(point);
                     }
