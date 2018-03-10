@@ -55,24 +55,14 @@ public class Server {
     }
 
     void getPoints(final double latitude, final double longitude, final GetPointsCallbackInterface callback) {
-        // TODO: Implement making the network call
         Log.d(TAG, "Getting points at " + latitude + ", " + longitude);
-        final ArrayList<Point> points = new ArrayList<Point>();
+        final ArrayList<Point> points = new ArrayList<>();
         AsyncTask.execute(new Runnable() {
             public void run() {
-                String getspoint;
                 try {
-                    // This magic URL is used to connect to "localhost" on your computer
-                    // instead of the "localhost" on the emulator
-                    // lat=123,long=456
                     final URL getEndpoint = new URL(SERVER + "messages?lat=" + latitude + ",long=" + longitude);
                     final HttpURLConnection myConnection =
                             (HttpURLConnection) getEndpoint.openConnection();
-                    try {
-                        InputStream in = myConnection.getInputStream();
-                    } finally {
-                        myConnection.disconnect();
-                    }
                     final int responseCode = myConnection.getResponseCode();
                     if (responseCode != 200) {
                         Log.w(TAG, String.format("Server returned status code: %d", responseCode));
@@ -87,24 +77,22 @@ public class Server {
                         final JSONObject location = json.getJSONObject("location");
                         final double lat = location.getDouble("lat");
                         final double lon = location.getDouble("long");
-                        Point newpoint = new Point(lat, lon, messages);
-                        points.add(newpoint);
+                        Point point= new Point(lat, lon, messages);
+                        points.add(point);
                     }
                     System.out.println(response);
                     Log.d(TAG, response);
                     callback.getPointsResponse(true, points, null);
-                   getspoint = response;
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
-                    getspoint = e.getLocalizedMessage();
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
-                    getspoint = e.getLocalizedMessage();
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (JSONException token) {
                     Log.e(TAG, "JSON Exception error");
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 }
-
-
             }
         });
     }
