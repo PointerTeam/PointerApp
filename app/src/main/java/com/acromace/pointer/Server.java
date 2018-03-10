@@ -55,94 +55,46 @@ public class Server {
     }
 
     void getPoints(final double latitude, final double longitude, final GetPointsCallbackInterface callback) {
-        // TODO: Implement making the network call
         Log.d(TAG, "Getting points at " + latitude + ", " + longitude);
-        final ArrayList<Point> points = new ArrayList<Point>();
+        final ArrayList<Point> points = new ArrayList<>();
         AsyncTask.execute(new Runnable() {
             public void run() {
-                String getspoint;
                 try {
-                    // This magic URL is used to connect to "localhost" on your computer
-                    // instead of the "localhost" on the emulator
-                    // lat=123,long=456
                     final URL getEndpoint = new URL(SERVER + "messages?lat=" + latitude + ",long=" + longitude);
                     final HttpURLConnection myConnection =
                             (HttpURLConnection) getEndpoint.openConnection();
-                    try {
-                        InputStream in = myConnection.getInputStream();
-//                        URL(HttpURLConnection.getInputStream()) = latitude + longitude;
-                        ;
-
-                    } finally {
-                        myConnection.disconnect();
-                    }
                     final int responseCode = myConnection.getResponseCode();
                     if (responseCode != 200) {
                         Log.w(TAG, String.format("Server returned status code: %d", responseCode));
                     }
 
-                     /* public Message readMessage(JsonReader reader) throws IOException {
-                    long id = -1;
-                    String text = null;
-                    User user = null;
-                    List<Double> geo = null;
-
-                    reader.beginObject();
-                    while (reader.hasNext()) {
-                        String name = reader.nextName();
-                        if (name.equals("id")) {
-                            id = reader.nextLong();
-                        } else if (name.equals("text")) {
-                            text = reader.nextString();
-                        } else if (name.equals("geo") && reader.peek() != JsonToken.NULL) {
-                            geo = readDoublesArray(reader);
-                        } else if (name.equals("user")) {
-                            user = readUser(reader);
-                        } else {
-                            reader.skipValue();
-                        }
-                    }
-                    reader.endObject();
-                    return new Message(id, text, user, geo);
-                }
-
-                  Scanner sc = new Scanner(System.in); */
-
-
                     final InputStream inputStream = myConnection.getInputStream();
                     final Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\Z");
                     final String response = scanner.next();
-                    // [{"message": "Hello world!", "location": {"lat": 43.472113, "long": -80.543936}}, {"message": "thank mr goose", "location": {"lat": 43.471772, "long": -80.545337}}]
 
                     final JSONArray token = new JSONArray(response);
                     for(int i = 0 ; i < token.length() ; i++) {
-                        // {"message": "Hello world!", "location": {"lat": 43.472113, "long": -80.543936}}
                         final JSONObject json = token.getJSONObject(i);
                         final String messages = json.getString("message");
                         final JSONObject location = json.getJSONObject("location");
                         final double lat = location.getDouble("lat");
                         final double lon = location.getDouble("long");
-                        Point newpoint = new Point(lat, lon, messages);
-                        points.add(newpoint);
+                        Point point= new Point(lat, lon, messages);
+                        points.add(point);
                     }
                     System.out.println(response);
                     Log.d(TAG, response);
                     callback.getPointsResponse(true, points, null);
-                    /*final String message = response;
-                    double latitude = scanner.next();
-                    double longitude = scanner.next();*/
-                   getspoint = response;
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
-                    getspoint = e.getLocalizedMessage();
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
-                    getspoint = e.getLocalizedMessage();
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (JSONException token) {
                     Log.e(TAG, "JSON Exception error");
+                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 }
-
-
             }
         });
     }
