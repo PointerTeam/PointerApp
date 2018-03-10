@@ -57,7 +57,7 @@ public class Server {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                String pingOutputText;
+
                 try {
                     // This magic URL is used to connect to "localhost" on your computer
                     // instead of the "localhost" on the emulator
@@ -116,12 +116,12 @@ public class Server {
                 } catch (MalformedURLException e) {
 
                     Log.e(TAG, "URL provided was malformed");
-                    pingOutputText = e.getLocalizedMessage();
+                  
                     callback.createPointResponse(false,e.getLocalizedMessage());
 
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
-                    pingOutputText = e.getLocalizedMessage();
+
                     callback.createPointResponse(false,e.getLocalizedMessage());
 
                 }
