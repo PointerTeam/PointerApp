@@ -5,12 +5,14 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,6 +48,7 @@ public class Server {
     private static final String SERVER_REMOTE = "http://acromace.pythonanywhere.com/";
 
     private static final String SERVER = SERVER_LOCALHOST; // Change this to SERVER_LOCALHOST to test locally
+    private java.lang.String msg;
 
     void createPoint(final Point point, final CreatePointCallbackInterface callback) {
         // TODO: Implement making the network call
@@ -68,9 +71,15 @@ public class Server {
                     myConnection.connect();
 
                     LatLng position = point.getPosition();
-                    byte[] outputBytes = ("{\"lat\": "+ position.latitude +", \"lon\": "+ position.longitude+"  , \"message\": " + point.getMessage() + "}").getBytes("UTF-8");
+                    JSONObject json = new JSONObject();
+                    json.put("lat", position.latitude);
+                    json.put("lon", position.longitude);
+                    json.put("message", point.getMessage());
+
                     OutputStream os = myConnection.getOutputStream();
-                    os.write(outputBytes);
+                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os);
+                    outputStreamWriter.write(json.toString());
+                    outputStreamWriter.flush();
                     os.close();
 
                     final int responseCode =myConnection.getResponseCode();
@@ -113,6 +122,13 @@ public class Server {
                     Log.e(TAG, "Error while opening connection to the server");
                     pingOutputText = e.getLocalizedMessage();
                 }
+                catch (JSONException e) {
+                    Log.e(TAG,"Error in creating JSON Object");
+
+                }
+
+
+
                 //callback.pingResponse(pingOutputText);
             }
         });
