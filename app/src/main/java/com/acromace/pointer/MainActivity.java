@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-// TODO: Add a button to recenter the map at your your location (see Maps app)
 // TODO: Separate out map marker creation to another function
 // TODO: Refresh the list of Points when coming back from CreatePointActivity
 
@@ -104,17 +103,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //Asking for the points at the location
                 server.getPoints(latitude, longitude, self);
 
-                // TODO: Save your current location to a variable and call updateMap
                 LatLng loc = new LatLng(latitude, longitude);
                 currentLocation = loc;
 
                 updateMap();
 
-                // TODO: Move this to updateMap and get the location from the saved one
-                // TODO: Change the Google Maps pin to something that looks better
-                googleMap.addMarker(new MarkerOptions()
-                        .position(currentLocation)
-                        .title("Your Location"));
                 if(!hasScrolled) {
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
                 }
@@ -174,14 +167,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     return;
                 }
                 updateMap();
-
-                // TODO: Move this to updateMap and get the points from the self that you saved above
-                for (Point point: points) {
-                    LatLng loc = point.getPosition();
-                    String msg = point.getMessage();
-                    // TODO: Change the Google Maps pin to something that looks better
-                    googleMap.addMarker(new MarkerOptions().position(loc).title(msg));
-                }
             }
         });
     }
@@ -239,10 +224,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //display points
                 if (points != null)
                 {
+                    // TODO: Change the Google Maps pin to something that looks better
+                    //Current location marker
                     googleMap.addMarker(new MarkerOptions()
                             .position(currentLocation)
                             .title("Your Location"));
 
+                    //Other Markers
                     for (int i = 0; i < points.size(); i++)
                     {
                         googleMap.addMarker(new MarkerOptions()
