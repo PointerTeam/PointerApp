@@ -69,12 +69,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-                                                     @Override
-                                                     public void onCameraMoveStarted(int i) {
-                                                         hasScrolled = true;
-                                                     }
-
-                                                 });
+            @Override
+            public void onCameraMoveStarted(int i) {
+                hasScrolled = true;
+            }
+        });
 
 
         // Check GPS is enabled
@@ -110,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentLocation = loc;
 
                 updateMap();
+
                 // TODO: Move this to updateMap and get the location from the saved one
                 // TODO: Change the Google Maps pin to something that looks better
                 googleMap.addMarker(new MarkerOptions()
                         .position(currentLocation)
                         .title("Your Location"));
-                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)));
                 if(!hasScrolled) {
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
                 }
@@ -230,12 +229,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void updateMap() {
-        // TODO: Have this function clear the map and re-add your current position and your points
         // This function should just be called when we receive new points (i.e. getPointsResponse)
         // and when our location is updated (i.e. onLocationChanged)
-        clearPointsFromMap();
-        //update points
-        //display points
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                clearPointsFromMap();
+
+                //display points
+                if (points != null)
+                {
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(currentLocation)
+                            .title("Your Location"));
+
+                    for (int i = 0; i < points.size(); i++)
+                    {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(points.get(i).getPosition())
+                                .title(points.get(i).getMessage()));
+                    }
+                }
+
+            }
+        });
+
+
     }
 
     private void clearPointsFromMap() {
