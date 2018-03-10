@@ -47,7 +47,7 @@ public class Server {
     private static final String SERVER_LOCALHOST = "http://10.0.2.2:5000/";
     private static final String SERVER_REMOTE = "http://acromace.pythonanywhere.com/";
 
-    private static final String SERVER = SERVER_LOCALHOST; // Change this to SERVER_LOCALHOST to test locally
+    private static final String SERVER = SERVER_REMOTE ; // Change this to SERVER_LOCALHOST to test locally
     private java.lang.String msg;
 
     void createPoint(final Point point, final CreatePointCallbackInterface callback) {
@@ -112,24 +112,25 @@ public class Server {
                     final Scanner scanner = new Scanner(inputStream, "UTF-8");
                     final String response = scanner.next();
                     Log.d(TAG, response);
-                    pingOutputText = response;
+                    callback.createPointResponse(true,null);
                 } catch (MalformedURLException e) {
-
 
                     Log.e(TAG, "URL provided was malformed");
                     pingOutputText = e.getLocalizedMessage();
+                    callback.createPointResponse(false,e.getLocalizedMessage());
+
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
                     pingOutputText = e.getLocalizedMessage();
+                    callback.createPointResponse(false,e.getLocalizedMessage());
+
                 }
                 catch (JSONException e) {
                     Log.e(TAG,"Error in creating JSON Object");
-
+                    callback.createPointResponse(false,e.getLocalizedMessage());
                 }
 
 
-
-                //callback.pingResponse(pingOutputText);
             }
         });
     }
