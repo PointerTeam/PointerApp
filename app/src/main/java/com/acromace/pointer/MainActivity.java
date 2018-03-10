@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 // TODO: Save your current location to a variable and call updateMap
                 LatLng loc = new LatLng(latitude, longitude);
+                currentLocation = loc;
+                updateMap();
 
                 updateMap();
                 // TODO: Move this to updateMap and get the location from the saved one
@@ -150,10 +152,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // success. If they have been successfully fetched, then points contains all of the points
     // in the requested area.
     public void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
+        final MainActivity self = this;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // TODO: Save the points here to self
+                self.points = points;
                 if (googleMap == null ) {
                     Log.w(TAG, "Points loaded but map has not");
                     return;

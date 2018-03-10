@@ -85,12 +85,15 @@ public class Server {
                     callback.getPointsResponse(true, points, null);
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
+                    callback.getPointsResponse(false,null,  e.getLocalizedMessage());
                     // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
+                    callback.getPointsResponse(false,null,  e.getLocalizedMessage());
                     // Pass the error message (e.getLocalizedMessage()) to the callback
-                } catch (JSONException token) {
+                } catch (JSONException e) {
                     Log.e(TAG, "JSON Exception error");
+                    callback.getPointsResponse(false,null,  e.getLocalizedMessage());
                     // Pass the error message (e.getLocalizedMessage()) to the callback
                 }
             }
