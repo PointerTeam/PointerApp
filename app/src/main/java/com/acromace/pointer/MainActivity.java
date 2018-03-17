@@ -1,5 +1,6 @@
 package com.acromace.pointer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -64,6 +65,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        if (currentLocation != null) {
+            server.getPoints(currentLocation.latitude, currentLocation.longitude, this);
+        }
+    }
+
+
+    @Override
     public void onMapReady(final GoogleMap googleMap) {
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -95,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST);
         }
+        updateMap();
 
         final MainActivity self = this;
 
@@ -108,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 //Asking for the points at the location
                 server.getPoints(latitude, longitude, self);
+                updateMap();
 
                 LatLng loc = new LatLng(latitude, longitude);
                 currentLocation = loc;
@@ -216,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 centreMap();
+                updateMap();
             }
         });
     }
@@ -233,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (points == null) return;
 
                 // TODO: Change the Google Maps pin to something that looks better
-                //Other Markers
+
 //                for (int i = 0; i < points.size(); i++)
 //                {
 //                    googleMap.addMarker(new MarkerOptions()
