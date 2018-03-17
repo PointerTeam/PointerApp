@@ -37,14 +37,14 @@ import com.google.maps.android.clustering.ClusterManager;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GetPointsCallbackInterface {
 
     private static final String TAG = "MainActivity";
-    public static final int LOCATION_REQUEST = 1;
-    private FloatingActionButton fab;
+    private static final int LOCATION_REQUEST = 1;
+    private FloatingActionButton fabCreateMessage;
     private FloatingActionButton fabCurrLoc;
     private GoogleMap googleMap;
     private Server server = new Server();
-    private static LatLng currentLocation; // Current location of the user
+    private LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
-    private boolean hasScrolled = false;
+    private boolean hasScrolled = false; // Used to indicate if the user has manually scrolled
     private ClusterManager<Point> clusterManager;
 
     @Override
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fab = findViewById(R.id.add_fab);
+        fabCreateMessage = findViewById(R.id.add_fab);
         fabCurrLoc = findViewById(R.id.curr_loc);
 
         setupCreateMessageFab();
@@ -141,6 +141,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void attemptListeningForLocations() {
         // Check GPS is enabled
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (lm == null) {
+            Log.e(TAG, "Could not get the LocationManager while attempting to listen for locations");
+            return;
+        }
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         }
@@ -247,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Setup the create message fab
     private void setupCreateMessageFab() {
         final MainActivity mainActivity = this;
-        fab.setOnClickListener(new View.OnClickListener() {
+        fabCreateMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mainActivity, CreatePointActivity.class);

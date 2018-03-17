@@ -141,6 +141,7 @@ public class Server {
                         Point point= new Point(lat, lon, messages);
                         points.add(point);
                     }
+                    myConnection.disconnect();
                     Log.d(TAG, response);
                     callback.getPointsResponse(true, points, null);
                 } catch (MalformedURLException e) {
@@ -170,7 +171,7 @@ public class Server {
                 final URL pingEndpoint = new URL(SERVER + "ping");
                 final HttpURLConnection myConnection =
                         (HttpURLConnection) pingEndpoint.openConnection();
-                final int responseCode =myConnection.getResponseCode();
+                final int responseCode = myConnection.getResponseCode();
                 if (responseCode != 200) {
                     Log.w(TAG, String.format("Server returned status code: %d", responseCode));
                 }
@@ -179,15 +180,15 @@ public class Server {
                 final Scanner scanner = new Scanner(inputStream, "UTF-8");
                 final String response = scanner.next();
                 Log.d(TAG, response);
-                pingOutputText = response;
+                myConnection.disconnect();
+                callback.pingResponse(response);
             } catch (MalformedURLException e) {
                 Log.e(TAG, "URL provided was malformed");
-                pingOutputText = e.getLocalizedMessage();
+                callback.pingResponse(e.getLocalizedMessage());
             } catch (java.io.IOException e) {
                 Log.e(TAG, "Error while opening connection to the server");
-                pingOutputText = e.getLocalizedMessage();
+                callback.pingResponse(e.getLocalizedMessage());
             }
-            callback.pingResponse(pingOutputText);
             }
         });
     }
