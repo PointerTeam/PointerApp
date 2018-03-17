@@ -1,5 +1,6 @@
 package com.acromace.pointer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,7 +8,11 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+<<<<<<< HEAD
 import android.os.Handler;
+=======
+import android.os.Build;
+>>>>>>> cd71d56d43a8d8efe1f06dd55e8eea60b973be30
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,10 +20,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +41,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -43,6 +58,7 @@ import static android.Manifest.permission.READ_SMS;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GetPointsCallbackInterface {
 
+    private Context context;
     private static final String TAG = "MainActivity";
     public static final int LOCATION_REQUEST = 1;
     private FloatingActionButton fab;
@@ -52,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
     private boolean hasScrolled = false;
+    private PopupWindow popUp;
     private ClusterManager<Point> clusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = getApplicationContext();
 
         fab = findViewById(R.id.add_fab);
         fabCurrLoc = findViewById(R.id.curr_loc);
@@ -82,11 +100,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        if (currentLocation != null) {
+            server.getPoints(currentLocation.latitude, currentLocation.longitude, this);
+        }
+    }
+
+
+    @Override
     public void onMapReady(final GoogleMap googleMap) {
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
-        this.googleMap.setMyLocationEnabled(true);
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
@@ -110,16 +138,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST);
-        }
-
-        else {
-
-        start_listening();
+        } else {
+            start_listening();
         }
     }
-
-        // Check for permissions
-        // TODO: After checking for permissions, don't start accessing the location until it's enabled
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -241,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 centreMap();
+                updateMap();
             }
         });
     }
@@ -255,10 +278,102 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void run() {
                 clearPointsFromMap();
 
+                // Initialize a new instance of LayoutInflater service
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+
+                // Inflate the custom layout/view
+                final View customView = inflater.inflate(R.layout.popup_layout,null);
+                final TextView popupMessage = customView.findViewById(R.id.popup_message);
+
+                GoogleMap.OnMarkerClickListener click = new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        //TODO: if message is empty return false?
+
+                        //popup window success
+                        Log.i(TAG, "Popup Msg: " + marker.getTitle().toString());
+
+                        popupMessage.setText(marker.getTitle().toString());
+
+                        /*
+                            public PopupWindow (View contentView, int width, int height)
+                                Create a new non focusable popup window which can display the contentView.
+                                The dimension of the window must be passed to this constructor.
+
+                                The popup does not provide any background. This should be handled by
+                                the content view.
+
+                            Parameters
+                                contentView : the popup's content
+                                width : the popup's width
+                                height : the popup's height
+                        */
+
+                        // Initialize a new instance of popup window
+                        if (popUp == null) {
+                            popUp = new PopupWindow(
+                                    customView,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                            );
+                        }
+
+                        // Set an elevation value for popup window
+                        // Call requires API level 21
+                        if(Build.VERSION.SDK_INT >= 21){
+                            popUp.setElevation(5.0f);
+                        }
+
+                        // Get a reference for the custom view close button
+                        ImageButton closeButton = (ImageButton) customView.findViewById(R.id.ib_close);
+
+                        // Set a click listener for the popup window close button
+                        closeButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Dismiss the popup window
+                                popUp.dismiss();
+                            }
+                        });
+
+                        /*
+                            public void showAtLocation (View parent, int gravity, int x, int y)
+                                Display the content view in a popup window at the specified location. If the
+                                popup window cannot fit on screen, it will be clipped.
+                                Learn WindowManager.LayoutParams for more information on how gravity and the x
+                                and y parameters are related. Specifying a gravity of NO_GRAVITY is similar
+                                to specifying Gravity.LEFT | Gravity.TOP.
+
+                            Parameters
+                                parent : a parent view to get the getWindowToken() token from
+                                gravity : the gravity which controls the placement of the popup window
+                                x : the popup's x location offset
+                                y : the popup's y location offset
+                        */
+                        // Finally, show the popup window at the center location of root relative layout
+                        popUp.showAtLocation(findViewById(R.id.map), Gravity.CENTER,0,0);
+
+                        return true;
+                    }
+                };
+
+                //display points
+                if (points != null)
+                {
+                    //Other Markers
+                    for (int i = 0; i < points.size(); i++)
+                    {
+                        googleMap.setOnMarkerClickListener(click);
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(points.get(i).getPosition())
+                                .title(points.get(i).getMessage()));
+                    }
+                }
+
                 if (points == null) return;
 
                 // TODO: Change the Google Maps pin to something that looks better
-                //Other Markers
+
 //                for (int i = 0; i < points.size(); i++)
 //                {
 //                    googleMap.addMarker(new MarkerOptions()
