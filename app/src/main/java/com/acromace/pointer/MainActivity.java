@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         popupMessage.setText(marker.getTitle().toString());
 
+                        LatLng pointLoc = marker.getPosition();
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pointLoc, 15.0f));
+
                         /*
                             public PopupWindow (View contentView, int width, int height)
                                 Create a new non focusable popup window which can display the contentView.
@@ -332,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 y : the popup's y location offset
                         */
                         // Finally, show the popup window at the center location of root relative layout
-                        popUp.showAtLocation(findViewById(R.id.map), Gravity.CENTER,0,0);
+                        popUp.showAtLocation(findViewById(R.id.map), Gravity.CENTER,0,-200);
 
                         return true;
                     }
