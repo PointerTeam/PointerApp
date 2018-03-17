@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
+        this.googleMap.setMyLocationEnabled(true);
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
@@ -222,24 +224,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void run() {
                 clearPointsFromMap();
 
-                //display points
-                if (points != null)
+                if (points == null) return;
+
+                // TODO: Change the Google Maps pin to something that looks better
+                //Other Markers
+                for (int i = 0; i < points.size(); i++)
                 {
-                    // TODO: Change the Google Maps pin to something that looks better
-                    //Current location marker
                     googleMap.addMarker(new MarkerOptions()
-                            .position(currentLocation)
-                            .title("Your Location"));
-
-                    //Other Markers
-                    for (int i = 0; i < points.size(); i++)
-                    {
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(points.get(i).getPosition())
-                                .title(points.get(i).getMessage()));
-                    }
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fire))
+                            .position(points.get(i).getPosition())
+                            .title(points.get(i).getMessage()));
                 }
-
             }
         });
     }
