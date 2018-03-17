@@ -246,7 +246,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void run() {
                 clearPointsFromMap();
 
-<<<<<<< HEAD
                 // Initialize a new instance of LayoutInflater service
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
 
@@ -345,7 +344,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
 
-=======
                 if (points == null) return;
 
                 // TODO: Change the Google Maps pin to something that looks better
@@ -361,7 +359,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // feeds the points to the hungry cluster manager :)
                 clusterManager.clearItems();
                 clusterManager.addItems(points);
->>>>>>> 175e89f65e442dca87f4f83fd4640011bafa19a8
             }
         });
     }
