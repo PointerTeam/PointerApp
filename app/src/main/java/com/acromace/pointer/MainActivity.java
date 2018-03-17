@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,7 +18,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,6 +32,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.READ_SMS;
 
 
 // TODO: Separate out map marker creation to another function
@@ -63,6 +72,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        ActivityCompat.requestPermissions(this,
+                new String[]{ACCESS_FINE_LOCATION},
+                LOCATION_REQUEST);
+    }
+
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         // Add a marker at current location and move the map's camera to the same location.
@@ -86,8 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             buildAlertMessageNoGps();
         }
 
-        // Check for permissions
-        // TODO: After checking for permissions, don't start accessing the location until it's enabled
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted so request
@@ -96,48 +112,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LOCATION_REQUEST);
         }
 
-        final MainActivity self = this;
+        else {
 
-        LocationListener ll = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                //when the location changes, update the map by zooming to the location
-                double longitude = location.getLongitude();
-                double latitude = location.getLatitude();
-                Log.i(TAG, "Location changed: " + latitude + " " + longitude);
-
-                //Asking for the points at the location
-                server.getPoints(latitude, longitude, self);
-
-                LatLng loc = new LatLng(latitude, longitude);
-                currentLocation = loc;
-
-                updateMap();
-
-                if(!hasScrolled) {
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        //Get Coordinates
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, ll);
+        start_listening();
+        }
     }
+
+        // Check for permissions
+        // TODO: After checking for permissions, don't start accessing the location until it's enabled
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -176,6 +158,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    void start_listening() {
+
+        final MainActivity self = this;
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationListener ll = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                //when the location changes, update the map by zooming to the location
+                double longitude = location.getLongitude();
+                double latitude = location.getLatitude();
+                Log.i(TAG, "Location changed: " + latitude + " " + longitude);
+                //Asking for the points at the location
+                server.getPoints(latitude, longitude, self);
+
+                LatLng loc = new LatLng(latitude, longitude);
+                currentLocation = loc;
+
+                updateMap();
+
+                if (!hasScrolled) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        //Get Coordinates
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, ll);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
