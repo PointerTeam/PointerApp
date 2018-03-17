@@ -1,6 +1,5 @@
 package com.acromace.pointer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,11 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-<<<<<<< HEAD
-import android.os.Handler;
-=======
 import android.os.Build;
->>>>>>> cd71d56d43a8d8efe1f06dd55e8eea60b973be30
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,31 +20,22 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.READ_SMS;
 
 
 // TODO: Separate out map marker creation to another function
@@ -139,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST);
         } else {
-            start_listening();
+            startListeningForLocations();
         }
     }
 
@@ -180,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    void start_listening() {
-
+    void startListeningForLocations() {
         final MainActivity self = this;
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener ll = new LocationListener() {
