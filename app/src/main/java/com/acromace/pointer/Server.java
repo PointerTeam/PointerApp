@@ -58,16 +58,12 @@ public class Server {
     private java.lang.String msg;
 
     void createPoint(final Point point, final CreatePointCallbackInterface callback) {
-        // TODO: Implement making the network call
-        Log.v(TAG, "Ping!");
+        Log.d(TAG, "Creating point " + point.toString());
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-
                 try {
-                    // This magic URL is used to connect to "localhost" on your computer
-                    // instead of the "localhost" on the emulator
                     final URL createEndpoint = new URL(SERVER + "messages");
                     final HttpURLConnection myConnection =
                             (HttpURLConnection) createEndpoint.openConnection();
@@ -77,67 +73,44 @@ public class Server {
                     myConnection.setRequestMethod("POST");
                     myConnection.connect();
 
-                    LatLng position = point.getPosition();
-                    JSONObject json = new JSONObject();
-                    json.put("lat", position.latitude);
-                    json.put("lon", position.longitude);
-                    json.put("message", point.getMessage());
-
+                    // Send the JSON to the server
                     OutputStream os = myConnection.getOutputStream();
                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os);
-                    outputStreamWriter.write(json.toString());
+                    outputStreamWriter.write(point.toJSON().toString());
                     outputStreamWriter.flush();
                     os.close();
 
-                    final int responseCode =myConnection.getResponseCode();
-                                    switch(responseCode) {
-                        case 200: //all ok
-                            break;
-                        case 401:
-                        case 403:
-                            // authorized
-                            break;
-                        default:
-                            //whatever else...
-                            String httpResponse = myConnection.getResponseMessage();
-                            BufferedReader br = new BufferedReader(new InputStreamReader(myConnection.getErrorStream()));
-                            Log.w(TAG, String.format("Server returned status code: %d", responseCode));
-                            String line;
-                            try {
-                                while ((line = br.readLine()) != null) {
-                                    Log.d("error", "    " + line);
-                                }
-                            } catch (Exception ex) {
-                                //nothing to do here
-                            }
-
-                            break;
+                    // Handle error
+                    final int responseCode = myConnection.getResponseCode();
+                    if (responseCode != 200) {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(myConnection.getErrorStream()));
+                        Log.w(TAG, String.format("Server returned status code: %d", responseCode));
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            Log.e(TAG, line);
+                        }
+                        callback.createPointResponse(false, "Server responded with failure: " + responseCode);
+                        return;
                     }
+
                     myConnection.disconnect();
 
+                    // Get the response from the server
                     final InputStream inputStream = myConnection.getInputStream();
                     final Scanner scanner = new Scanner(inputStream, "UTF-8");
                     final String response = scanner.next();
                     Log.d(TAG, response);
                     callback.createPointResponse(true,null);
                 } catch (MalformedURLException e) {
-
                     Log.e(TAG, "URL provided was malformed");
-                  
-                    callback.createPointResponse(false,e.getLocalizedMessage());
-
+                    callback.createPointResponse(false, e.getLocalizedMessage());
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
-
-                    callback.createPointResponse(false,e.getLocalizedMessage());
-
-                }
-                catch (JSONException e) {
+                    callback.createPointResponse(false, e.getLocalizedMessage());
+                } catch (JSONException e) {
                     Log.e(TAG,"Error in creating JSON Object");
-                    callback.createPointResponse(false,e.getLocalizedMessage());
+                    callback.createPointResponse(false, e.getLocalizedMessage());
                 }
-
-
             }
         });
     }
@@ -168,21 +141,17 @@ public class Server {
                         Point point= new Point(lat, lon, messages);
                         points.add(point);
                     }
-                    System.out.println(response);
                     Log.d(TAG, response);
                     callback.getPointsResponse(true, points, null);
                 } catch (MalformedURLException e) {
                     Log.e(TAG, "URL provided was malformed");
                     callback.getPointsResponse(false,null,  e.getLocalizedMessage());
-                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (java.io.IOException e) {
                     Log.e(TAG, "Error while opening connection to the server");
                     callback.getPointsResponse(false,null,  e.getLocalizedMessage());
-                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 } catch (JSONException e) {
                     Log.e(TAG, "JSON Exception error");
                     callback.getPointsResponse(false,null,  e.getLocalizedMessage());
-                    // Pass the error message (e.getLocalizedMessage()) to the callback
                 }
             }
         });

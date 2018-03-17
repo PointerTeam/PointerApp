@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Server server = new Server();
     private static LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
-    // TODO: Find a way to check if the user has scrolled on the map and save it here
     private boolean hasScrolled = false;
 
     @Override
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab = findViewById(R.id.add_fab);
         fabCurrLoc = findViewById(R.id.curr_loc);
 
-        setupFab();
+        setupCreateMessageFab();
         setupFabCurrLoc();
 
         // Get the SupportMapFragment and request notification
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 hasScrolled = true;
             }
         });
-
 
         // Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -160,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // TODO: Save the points here to self
                 self.points = points;
                 if (googleMap == null ) {
                     Log.w(TAG, "Points loaded but map has not");
@@ -192,7 +189,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void setupFab() {
+    // Setup the create message fab
+    private void setupCreateMessageFab() {
         final MainActivity mainActivity = this;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    // Setup the current location recentering fab
     private void setupFabCurrLoc() {
         fabCurrLoc.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void updateMap() {
+        // Remove all points from the map and re-add them all
+        //
         // This function should just be called when we receive new points (i.e. getPointsResponse)
         // and when our location is updated (i.e. onLocationChanged)
         runOnUiThread(new Runnable() {
@@ -241,11 +242,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-
-
     }
 
     private void clearPointsFromMap() {
+        // Remove all the points from the map
         if (googleMap != null) {
             googleMap.clear();
         }

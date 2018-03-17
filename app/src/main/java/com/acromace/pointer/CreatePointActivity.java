@@ -20,7 +20,6 @@ public class CreatePointActivity extends AppCompatActivity implements CreatePoin
 
     Server server = new Server();
     private static final String TAG = "CreatePointActivity";
-    private GoogleMap googleMap;
     LatLng currentLocation;
 
     @Override
