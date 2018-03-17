@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -81,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
-        this.googleMap.setMyLocationEnabled(true);
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
@@ -150,9 +153,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Get Coordinates
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, ll);
-
-
-
     }
 
     private void buildAlertMessageNoGps() {
@@ -328,12 +328,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //display points
                 if (points != null)
                 {
-                    // TODO: Change the Google Maps pin to something that looks better
-                    //Current location marker
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(currentLocation)
-                            .title("Your Location"));
-
                     //Other Markers
                     for (int i = 0; i < points.size(); i++)
                     {
