@@ -31,9 +31,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 
 // TODO: Separate out map marker creation to another function
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Point> points; // Points fetched from getPoints
     private boolean hasScrolled = false;
     private PopupWindow popUp;
+    private ClusterManager<Point> clusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker at current location and move the map's camera to the same location.
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
+        this.googleMap.setMyLocationEnabled(true);
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
@@ -85,6 +89,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 hasScrolled = true;
             }
         });
+
+        clusterManager = new ClusterManager<Point>(this, googleMap);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnMarkerClickListener(clusterManager);
 
         // Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -238,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void run() {
                 clearPointsFromMap();
 
+<<<<<<< HEAD
                 // Initialize a new instance of LayoutInflater service
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
 
@@ -336,6 +345,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
 
+=======
+                if (points == null) return;
+
+                // TODO: Change the Google Maps pin to something that looks better
+                //Other Markers
+//                for (int i = 0; i < points.size(); i++)
+//                {
+//                    googleMap.addMarker(new MarkerOptions()
+//                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fire))
+//                            .position(points.get(i).getPosition())
+//                            .title(points.get(i).getMessage()));
+//                }
+
+                // feeds the points to the hungry cluster manager :)
+                clusterManager.clearItems();
+                clusterManager.addItems(points);
+>>>>>>> 175e89f65e442dca87f4f83fd4640011bafa19a8
             }
         });
     }

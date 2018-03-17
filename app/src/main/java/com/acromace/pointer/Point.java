@@ -1,6 +1,7 @@
 package com.acromace.pointer;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +10,7 @@ import org.json.JSONObject;
  * Created by acromace on 2018-02-17.
  */
 
-public class Point {
+public class Point implements ClusterItem {
 
     final private LatLng position;
     final private String message;
@@ -28,10 +29,6 @@ public class Point {
         return this.message;
     }
 
-    LatLng getPosition() {
-        return this.position;
-    }
-
     public String toString() {
         return "Point[ Location: " + this.position.toString() + ", Message: " + this.message + " ]";
     }
@@ -43,5 +40,18 @@ public class Point {
         json.put("message", message);
         return json;
     }
+    @Override
+    public LatLng getPosition() {
+        return this.position;
+    }
 
+    @Override
+    public String getTitle() {
+        return this.message;
+    }
+
+    @Override
+    public String getSnippet() {
+        return "";
+    }
 }
