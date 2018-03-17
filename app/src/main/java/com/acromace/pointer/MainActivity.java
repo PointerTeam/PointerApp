@@ -38,10 +38,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 
-// TODO: Separate out map marker creation to another function
-// TODO: Refresh the list of Points when coming back from CreatePointActivity
-
-
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GetPointsCallbackInterface {
 
     private Context context;
@@ -74,32 +70,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        ActivityCompat.requestPermissions(this,
-                new String[]{ACCESS_FINE_LOCATION},
-                LOCATION_REQUEST);
+        // Get location permission
+        attemptListeningForLocations();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
+        // Get points when we come back to the screen
+        // This handles the case where we create a point and then return to this screen
         if (currentLocation != null) {
             server.getPoints(currentLocation.latitude, currentLocation.longitude, this);
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        // This is used to add the debug button (see onOptionsItemSelected)
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // This adds the debug button to the action bar at the top right
+            case R.id.action_debug:
+                Intent intent = new Intent(this, DebugActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         // Add a marker at current location and move the map's camera to the same location.
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         this.googleMap = googleMap;
-        googleMap.setMyLocationEnabled(true);
+        try {
+            googleMap.setMyLocationEnabled(true);
+        } catch (SecurityException e) {
+            Log.w(TAG, "Not showingcurrent location as we don't have permission");
+        }
+
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
@@ -112,12 +128,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         clusterManager = new ClusterManager<Point>(this, googleMap);
         googleMap.setOnCameraIdleListener(clusterManager);
         googleMap.setOnMarkerClickListener(clusterManager);
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        // Called after we attempt to start listening to locations but realize we don't have permission
+        // We request permissions from the user, then when the user makes a choice, this gets called
+        if (grantResults.length > 0) {
+            startListeningForLocations();
+        } else {
+            Log.e(TAG, "The user declined location permissions");
+        }
+    }
+
+    // Try to start listening for locations
+    // If we don't have permissions, then request it
+    private void attemptListeningForLocations() {
         // Check GPS is enabled
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         }
 
+        // If we don't have location permissions, request it
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted so request
@@ -125,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST);
         } else {
+            // Otherwise, if it is granted, just start listening for locations
             startListeningForLocations();
         }
     }
@@ -147,10 +181,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         alert.show();
     }
 
-    // getPointsResponse(success, points, errorMessage) puts points on the map, with success
-    // indicating if the points have been successfully fetched. errorMessage if it is not a
-    // success. If they have been successfully fetched, then points contains all of the points
-    // in the requested area.
+    // Start listening for locations
+    // Assumes that we already have permissions granted
+    void startListeningForLocations() {
+        final MainActivity self = this;
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (lm == null) {
+            Log.e(TAG, "Could not get the LocationManager in startListeningForLocations");
+            return;
+        }
+
+        LocationListener ll = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                //when the location changes, update the map by zooming to the location
+                double longitude = location.getLongitude();
+                double latitude = location.getLatitude();
+                Log.i(TAG, "Location changed: " + latitude + " " + longitude);
+
+                //Asking for the points at the new location
+                server.getPoints(latitude, longitude, self);
+
+                // Update our location and scroll to it
+                currentLocation = new LatLng(latitude, longitude);;
+                if (!hasScrolled) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+                // Called when GPS status changes
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                // Called when the user turns on the GPS
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                // Called when the user turns off the GPS
+            }
+        };
+
+        // Get Coordinates
+        try {
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, ll);
+        } catch (SecurityException e) {
+            Log.e(TAG, "Attempted to start listening for location without having permission");
+        }
+    }
+
+    // Receives a list of points fetched and updates the map
     public void getPointsResponse(final boolean success, final ArrayList<Point> points, final String errorMessage) {
         final MainActivity self = this;
         runOnUiThread(new Runnable() {
@@ -164,69 +247,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 updateMap();
             }
         });
-    }
-
-    void startListeningForLocations() {
-        final MainActivity self = this;
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener ll = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                //when the location changes, update the map by zooming to the location
-                double longitude = location.getLongitude();
-                double latitude = location.getLatitude();
-                Log.i(TAG, "Location changed: " + latitude + " " + longitude);
-                //Asking for the points at the location
-                server.getPoints(latitude, longitude, self);
-
-                LatLng loc = new LatLng(latitude, longitude);
-                currentLocation = loc;
-
-                updateMap();
-
-                if (!hasScrolled) {
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        //Get Coordinates
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, ll);
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // This is used to add the debug button (see onOptionsItemSelected)
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // This adds the debug button to the action bar at the top right
-            case R.id.action_debug:
-                Intent intent = new Intent(this, DebugActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     // Setup the create message fab
@@ -248,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 centreMap();
-                updateMap();
             }
         });
     }
@@ -273,12 +292,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 GoogleMap.OnMarkerClickListener click = new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
+                        if (marker.getTitle() == null) return false;
                         //TODO: if message is empty return false?
 
                         //popup window success
-                        Log.i(TAG, "Popup Msg: " + marker.getTitle().toString());
-
-                        popupMessage.setText(marker.getTitle().toString());
+                        Log.i(TAG, "Popup Msg: " + marker.getTitle());
+                        popupMessage.setText(marker.getTitle());
 
                         LatLng pointLoc = marker.getPosition();
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pointLoc, 15.0f));
@@ -344,31 +363,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return true;
                     }
                 };
-
-                //display points
-                if (points != null)
-                {
-                    //Other Markers
-                    for (int i = 0; i < points.size(); i++)
-                    {
-                        googleMap.setOnMarkerClickListener(click);
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(points.get(i).getPosition())
-                                .title(points.get(i).getMessage()));
-                    }
-                }
+                googleMap.setOnMarkerClickListener(click);
 
                 if (points == null) return;
-
-                // TODO: Change the Google Maps pin to something that looks better
-
-//                for (int i = 0; i < points.size(); i++)
-//                {
-//                    googleMap.addMarker(new MarkerOptions()
-//                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fire))
-//                            .position(points.get(i).getPosition())
-//                            .title(points.get(i).getMessage()));
-//                }
 
                 // feeds the points to the hungry cluster manager :)
                 clusterManager.clearItems();
