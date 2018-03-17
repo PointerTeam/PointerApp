@@ -25,6 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 
 // TODO: Separate out map marker creation to another function
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static LatLng currentLocation; // Current location of the user
     private ArrayList<Point> points; // Points fetched from getPoints
     private boolean hasScrolled = false;
+    private ClusterManager<Point> clusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 hasScrolled = true;
             }
         });
+
+        clusterManager = new ClusterManager<Point>(this, googleMap);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnMarkerClickListener(clusterManager);
 
         // Check GPS is enabled
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -228,13 +234,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 // TODO: Change the Google Maps pin to something that looks better
                 //Other Markers
-                for (int i = 0; i < points.size(); i++)
-                {
-                    googleMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fire))
-                            .position(points.get(i).getPosition())
-                            .title(points.get(i).getMessage()));
-                }
+//                for (int i = 0; i < points.size(); i++)
+//                {
+//                    googleMap.addMarker(new MarkerOptions()
+//                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fire))
+//                            .position(points.get(i).getPosition())
+//                            .title(points.get(i).getMessage()));
+//                }
+
+                // feeds the points to the hungry cluster manager :)
+                clusterManager.clearItems();
+                clusterManager.addItems(points);
             }
         });
     }
