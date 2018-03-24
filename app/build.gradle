@@ -5,6 +5,7 @@ android {
     defaultConfig {
         applicationId "com.acromace.pointer"
         minSdkVersion 21
+        multiDexEnabled true
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
