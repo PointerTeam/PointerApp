@@ -338,6 +338,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void centreMap() {
         // Centres map at current location
         hasScrolled = false;
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+        if (googleMap != null && currentLocation != null) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15.0f));
+        }
     }
 }
