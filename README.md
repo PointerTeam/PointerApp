@@ -1,13 +1,16 @@
-﻿# Pointer Client
+# Pointer Client
 
 Android app that lets you put messages on a map and get messages near you
+
+![](https://github.com/PointerTeam/PointerApp/raw/master/Screenshot.png)
+
+Video demo: [https://www.youtube.com/watch?v=lAqzTX5RzQg](https://www.youtube.com/watch?v=lAqzTX5RzQg)
 
 
 ## Team members
 
 - 🐶 Apoorv @apoorvp16
 - 🐱 Umang @Umang080799
-- 🐹
 - 🐰 Luana @l398chen
 - 🐼 Nick @tkfi
 - 🐵 JP @junpark97
